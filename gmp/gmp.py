@@ -536,20 +536,33 @@ class _gmp:
         assert name
         assert make_unique
 
+        tags = ''
         if 'asset_hosts' in kwargs:
             hosts = kwargs.get('asset_hosts')
             filter = hosts['filter']
 
-            hosts = '<asset_hosts filter="%s"/>' % filter
+            tags += '<asset_hosts filter="%s"/>' % filter
 
         elif 'hosts' in kwargs:
             hosts = kwargs.get('hosts')
-            hosts = '<hosts>%s</hosts>' % hosts
+            tags += '<hosts>%s</hosts>' % hosts
         else:
             pass
 
+        if 'comment' in kwargs:
+            comment = kwargs.get('comment')
+            tags += '<comment>%s</comment>' % comment
+
+        if 'alive_tests' in kwargs:
+            alive_tests = kwargs.get('alive_tests')
+            tags += '<alive_tests>%s</alive_tests>' % alive_tests
+
+        if 'port_list' in kwargs:
+            port_list = kwargs.get('port_list')
+            tags += '<port_list id="%s"/>' % port_list
+
         return '<create_target><name>{0}</name>{1}' \
-               '</create_target>'.format(name, hosts)
+               '</create_target>'.format(name, tags)
 
     def createTaskCommand(self, name, config_id, target_id, scanner_id,
                           comment=''):
