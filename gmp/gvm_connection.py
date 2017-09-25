@@ -890,8 +890,10 @@ class TLSConnection(GVMConnection):
             if len(buffer) > 0 and (data is None or len(data) == 0):
                 break
             buffer += data
+            if len(data) < BUF_SIZE:
+                return buffer.decode()
 
-        return buffer.decode()
+        return 0
 
 
 class UnixSocketConnection(GVMConnection):
