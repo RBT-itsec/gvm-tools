@@ -871,6 +871,7 @@ class TLSConnection(GVMConnection):
         self.port = kwargs.get('port', 9390)
         self.timeout = kwargs.get('timeout', 60)
         self.shell_mode = kwargs.get('shell_mode', False)
+        self.read_timeout = kwargs.get('read_timeout', 10)
         context = ssl.SSLContext(ssl.PROTOCOL_TLSv1_2)
         self.sock = context.wrap_socket(socket.socket(socket.AF_INET))
         self.sock.settimeout(self.timeout)
@@ -879,15 +880,18 @@ class TLSConnection(GVMConnection):
     def sendAll(self, cmd):
         self.sock.send(cmd.encode())
 
-    def readAll(self):
-        response = ''
-        while True:
+    def readAll(self, read_timeout=None):
+        if read_timeout is None:
+            read_timeout = self.read_timeout
+        stime = time.time()
+        buffer = b''
+        while stime + read_timeout > time.time():
             data = self.sock.read(BUF_SIZE)
-
-            response += data.decode(errors='ignore')
-            if len(data) < BUF_SIZE:
+            if len(buffer) > 0 and (data is None or len(data) == 0):
                 break
-        return response
+            buffer += data
+
+        return buffer.decode()
 
 
 class UnixSocketConnection(GVMConnection):
