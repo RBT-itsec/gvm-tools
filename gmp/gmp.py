@@ -542,7 +542,6 @@ class _gmp:
         else:
             unique = 0
 
-        tags = ''
         if 'asset_hosts' in kwargs:
             hosts = kwargs.get('asset_hosts')
             filter = hosts['filter']
