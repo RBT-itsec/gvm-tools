@@ -23,7 +23,6 @@
 
 import logging
 import paramiko
-import re
 import socket
 import ssl
 import time
@@ -114,9 +113,11 @@ class GVMConnection:
         self.checkCommandStatus(response)
 
         if hasattr(self, 'shell_mode') and self.shell_mode is True: #pylint: disable=E1101
+            parser = etree.XMLParser(encoding='utf-8', recover=True)
+
             logger.info('Shell mode activated')
             f = StringIO(response)
-            tree = etree.parse(f)
+            tree = etree.parse(f, parser)
             return tree.getroot()
         else:
             return response
@@ -328,9 +329,9 @@ class GVMConnection:
         self.send(cmd)
         return self.read()
 
-    def create_task(self, name, config_id, target_id, scanner_id, comment=''):
+    def create_task(self, name, config_id, target_id, scanner_id, alert_id='', comment=''):
         cmd = self.gmp_generator.createTaskCommand(
-            name, config_id, target_id, scanner_id, comment)
+            name, config_id, target_id, scanner_id, alert_id, comment)
         self.send(cmd)
         return self.read()
 
